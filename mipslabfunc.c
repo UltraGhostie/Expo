@@ -322,3 +322,49 @@ char * itoaconv( int num )
    * we must add 1 in order to return a pointer to the first occupied position. */
   return( &itoa_buffer[ i + 1 ] );
 }
+
+// Code below is written/changed by Theodor Björkman
+#define ssr(n) (spi_send_recv(n)) 
+void display_test(int x, uint8_t *data) {
+	/*  int i, j;
+	
+	for(i = 0; i < 4; i++) {
+		DISPLAY_CHANGE_TO_COMMAND_MODE;
+
+		spi_send_recv(0x22); // 0010 0010 set page address
+		spi_send_recv(counter); // page i (4 visible 4 buffer, 0->7, up->down)
+		
+    // De här ser ut som set lower/higher column start address for page addressing mode
+		spi_send_recv(x & 0xF); // 0000 0000 0000 xxxx
+		spi_send_recv(0x10 | ((x >> 4) & 0xF)); // 0001 0000 | (0000 0000 xxxx 0000 >> 4) = 0001 xxxx
+		// if x = 0xab it will input first 0xb then 0x1a
+		DISPLAY_CHANGE_TO_DATA_MODE;
+		
+		for(j = 0; j < 32; j++)
+			spi_send_recv(~data[i*32 + j]); // sends data in chunks of 32
+	} */
+
+  // OKOK så ett försök på rita bild med horizontal addressing
+  DISPLAY_CHANGE_TO_COMMAND_MODE; // Settings för hur vi ska inputta skiten
+
+
+  ssr(0x20); // 0010 0000 set memory addressing mode, borde vara horizontal
+  ssr(0); // möjligtvis krävs
+
+  ssr(0xa7); // inverse display seems to be default
+
+  ssr(0x21); // 0x21 set column address
+  ssr(96); // column start
+  ssr(127); // end address
+
+  ssr(0x22); // set page address
+  ssr(0); // start
+  ssr(3); // end
+
+  DISPLAY_CHANGE_TO_DATA_MODE;
+  int i;
+  for (i = 0; i < 128; i++)
+  {
+    ssr(data[i]);
+  }
+}

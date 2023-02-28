@@ -53,3 +53,11 @@ void time2string( char *, int );
 int getbtns(void);
 int getsw(void);
 void enable_interrupt(void);
+
+// Define variables for project. Everything below is written by Theodor Björkman
+const uint8_t const test[128];
+uint8_t test2[128];
+int counter;
+
+// Define functions for project.
+void display_test( int x, uint8_t *data);

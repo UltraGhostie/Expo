@@ -16,7 +16,6 @@
 #include "mipslab.h"  /* Declatations for these labs */
 
 int mytime = 0x5957;
-volatile int* portlights = (volatile int*) 0xbf886110;
 int counter = 0;
 int timeoutcount = 0;
 int prime = 1234567;
@@ -31,11 +30,24 @@ void user_isr( void )
   {
     IFSCLR(0) = 0x8000;
     if (counter == 0xff) {
-    *portlights -= 0xff;
+    PORTE -= 0xff;
     counter = 0;
     }
     counter++;
-    (*portlights)++;
+    PORTE++;
+    display_update();
+    display_test(16, icon);
+  }
+  if (IFS(0) & 0x80){
+    IFSCLR(0) = 0x80;
+    display_update();
+    display_image(16,icon);
+  }
+  if (IFS(0) & 0x800){
+    IFSCLR(0) = 0x800;
+  }
+  if (IFS(0) & 0x80000){
+    IFSCLR(0) = 0x80000;
   }
   if (IFS(0) & 0x100 != 0x100)
   {
@@ -43,28 +55,30 @@ void user_isr( void )
   }
   IFSCLR(0) = 0x100;
   timeoutcount++;
-  if(timeoutcount != 10)
+  if(timeoutcount != 30)
     return;
   timeoutcount = 0;
-  time2string( textstring, mytime );
+  /*time2string( textstring, mytime );
   display_string( 3, textstring );
-  display_update();
-  tick( &mytime );
+  tick( &mytime ); */
 }
 
 /* Lab-specific initialization goes here */
 void labinit( void )
 {
-  // T: for surprise assignment
-  volatile int* trislights = (volatile int*) 0xbf886100;
-  *trislights &= 0xffffff00;
-  *portlights &= 0xffffff01;
-  TRISD |= 0x00000400; // T: 0100 0000 0000: <10> = sw3
-  IFSCLR(0) = 0x8000;
-  IECSET(0) = 0x8000;
-  IPCCLR(3) = 0x1c;
-  IPCCLR(3) = 0x3;
-  IPCSET(3) = 0xe;
+  TRISE &= 0xffffff00;
+  PORTE &= 0xffffff00;
+  TRISD |= 0x00000f00; // T: enable all sw
+  IFSCLR(0) = 0x88880; // Interrupts for sw
+  IECSET(0) = 0x88880;
+  IPCCLR(1) = 0x1f;
+  IPCSET(1) = 0xa;
+  IPCCLR(2) = 0x1f;
+  IPCSET(2) = 0xb;
+  IPCCLR(3) = 0x1f;
+  IPCSET(3) = 0xc;
+  IPCCLR(4) = 0x1f;
+  IPCSET(4) = 0xd;
 
 
 
@@ -73,7 +87,7 @@ void labinit( void )
   PR2 = 0x7a12; // T: 31'250. 80 MHz / 256 / 31250 = 10 Hz
   IFSCLR(0) = 0x100;
   IECSET(0) = 0x100;
-  IPCSET(2) = 0xD;
+  IPCSET(2) = 0xe;
   enable_interrupt();
   T2CONSET = 0x8000; // T: start timer
   
@@ -83,7 +97,7 @@ void labinit( void )
 /* This function is called repetitively from the main program */
 void labwork( void )
 {
-  prime = nextprime(prime);
+  /* prime = nextprime(prime);
   display_string(0, itoaconv(prime));
-  display_update();
+  display_update(); */
 }
