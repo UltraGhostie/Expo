@@ -56,8 +56,11 @@ void enable_interrupt(void);
 
 // Define variables for project. Everything below is written by Theodor Björkman
 const uint8_t const test[128];
-uint8_t test2[128];
+uint8_t scene[512];
 int counter;
 
 // Define functions for project.
-void display_test( int x, uint8_t *data);
+void display_scene( uint8_t *data);
+void clearscene(void);
+void addsprite(uint8_t* sprite, uint8_t x, uint8_t y);
+void updateentities(void);

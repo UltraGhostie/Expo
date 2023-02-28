@@ -4,7 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/opt/mcb32tools/include/**"
+                "/opt/mcb32tools/include/**",
+                "/opt/mcb32tools/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

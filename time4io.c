@@ -5,7 +5,7 @@
 // Everything below is written by Theodor Björkman
 int getsw(void)
 {
-    int r = 0xf00; // T: 1111 0000 0000
+    int r = 0xf00;
     r &= PORTD;
     r >>= 8;
     return r;
@@ -13,8 +13,9 @@ int getsw(void)
 
 int getbtns(void)
 {
-    int r = 0xe0; // T: 1110 0000
+    int r = 0xe0;
     r &= PORTD;
-    r >>= 5;
+    r >>= 4;
+    r |= (PORTF & 2) >> 1;
     return r;
 }
