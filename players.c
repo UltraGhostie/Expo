@@ -27,16 +27,17 @@ uint8_t p2[] = { 3, 8 };
 
 // ball
 
-int ballx = 62;
-int bally = 14;
+float ballx = 62;
+float bally = 14;
 
 int ballxsize = 3;
 int ballysize = 3;
 
 uint8_t ball[] = { 3, 3};
 
-float ballxv = 0;
-float ballyv = 0;
+double ballxv = 0;
+double ballyv = 0;
+
 // bounce on top/bottom
 void bounce(void)
 {
@@ -46,20 +47,38 @@ void bounce(void)
 player=1 for p1 player=2 for p2*/
 void reflect(int contactpoint, int player)
 {
+    switch (contactpoint)
+    {
+    case 0:
+        /* code */
+        break;
+    case 2:
+        /*code*/
+        break;
+    default:
+        break;
+    }
+    float yv = ballyv;
     float xv = ballxv;
     int invert = 0;
-    float mindelta = 0;
     float maxdelta;
-    if (xv < 0) // makes sure that angle will be between 0 and 180
+    double sin75 = 0.9659258263;
+    double sin285 = -sin75; 
+    if (xv < 0) // makes xv pos for easier math
     {
         xv = -xv;
         invert = 1;
     }
-    float angle = acosf(xv); // cos(v) = x, v = arccos(x)
-    if (angle < 15) // if angle has some way become way too sharp it is set to a playable amount
-        angle = 16;
-    if (angle > 165)
-        angle = 164;
+    double sina = yv; // cos(v) = x, v = arccos(x)
+    if (sina > 0.9659258263) // if angle has some way become way too sharp it is set to a playable amount
+        sina = 0.9612616959;
+    if (sina < -0.9659258263)
+        sina = -0.9612616959;
+
+    double cosa = xv;
+    double cos75 = 0.2588190451;
+    if (cosa > cos75)
+        cosa = 0.2756373558;
     float py;
     float by = bally + ballysize/2;
     float delta;
@@ -81,21 +100,23 @@ void reflect(int contactpoint, int player)
     // Scale delta to a range between angle and 15 or 165 depending on if delta is positive or negative
     float min = 0; 
     float max;
+    double newyv, newxv;
     if(delta > 0){
-        delta -= mindelta; // these first two normalises it in the range [0,1]
-        delta = delta/(maxdelta-mindelta);
-        delta = delta*(angle-15); // these next maps delta between the angle and 15 where angle > 15
-        delta += 15;
-        angle -= delta; // since it bounces on the top section and angle is always between 0 and 180 we subtract here
+        newyv = delta/maxdelta;// this normalises it in the range [0,1]
+        newyv = newyv*(sin75 - sina); // these next maps delta between sina and sin75 where sin75>sina
+        newyv += sina;
     }
     if(delta < 0){
-        delta = -delta; // set it to pos
-        delta -= mindelta;
-        delta = delta/(maxdelta-mindelta);
-        delta = delta*(165-angle); // here angle is < 165 so we subtract
-        delta += 15;
-        angle += delta; // opposite here, bounces on bottom section, 0<angle<180 so add
+        newyv = newyv/maxdelta;// set it to pos
+        newyv = newyv*(sina-sin285); // sina > sin285
+        newyv += sin285;
     }
+    newxv = delta/maxdelta;
+    newxv = newxv*(cosa - cos75); 
+    newxv += cosa;
+
+    ballyv = newyv;
+    ballxv = newxv;
 }
 // move functions are seperated as p2 should be able to disable input
 void movep1(void)
@@ -128,18 +149,6 @@ void movep2(void)
     case 2: // btn2
         if(p2y == 0)
             break;
-            /* OOO we got a big one, breakdown:
-            Will raising p2 put it at the same hight or higher than the bottom of ball
-            AND
-            Is it NOT over the ball
-            AND
-            Is the ball + ballsize at the same x or higher than p2 x
-            AND 
-            Is the ball NOT at a higher x than p2 + p2xsize
-            AKA will it go into the ball in which case it doesnt*/
-        if((p2y - 1 >= bally+ballysize) && !(p2y+p2ysize < bally) && (ballx+ballxsize >= p2x) && !(ballx > p2x+p2xsize))
-            reflect(2,2);
-            break;
         p2y--;
         break;
     case 1: // btn1
@@ -151,17 +160,109 @@ void movep2(void)
         break;
     }
 }
+
+int checkbounce(void)
+{
+    if (bally<0)
+    {
+        return 1;
+    }
+    if (bally+ballysize>31)
+    {
+        return 1;
+    }
+    return 0;
+}
+
+int checkcollision(void)
+{
+    int px;
+    int py;
+    int pysize;
+    int bx;
+    int by;
+    int p = 1;
+    if (ballx > 31) // if ball is on right side then it has to bounce at p2
+        p = 2;
+    
+    switch (p)
+    {
+    case 1: //case for p1
+        px = p1x+p1xsize;
+        py = p1y;
+        pysize = p1ysize;
+        bx = ballx;
+        by = bally;
+        if (bally < p1y)
+            by += ballysize;
+
+        // IF on paddle surface AND between top AND bottom of paddle return 1 for side
+        if((bx == px) && (by <= (py+pysize)) && (by >= py))
+            return 1;
+        // IF behind paddle surface AND higher up than half of paddle AND lower than top of paddle return 0 for top
+        if((bx < px) && (by < (py+(pysize/2))) && (by >= py))
+            return 0;
+        // IF behind paddle surface AND lower than half of paddle AND higher than bottom of paddle return 2 for bot
+        if((bx < px) && (by > (py+(pysize/2))) && (by <= py+pysize))
+            return 2;
+        break;
+    case 2:
+        px = p2x;
+        py = p2y;
+        pysize = p2ysize;
+        bx = ballx+ballxsize;
+        by = bally;
+        if (bally < p2y)
+            by += ballysize;
+        // IF on paddle surface AND between top AND bottom of paddle return 1
+        if((bx == px) && (by <= (py+pysize)) && (by >= py))
+            return 1;
+        // IF behind paddle surface AND higher up than half of paddle AND lower than top of paddle return 0 for top
+        if((bx > px) && (by < (py+(pysize/2))) && (by >= py))
+            return 0;
+        // IF behind paddle surface AND lower than half of paddle AND higher than bottom of paddle return 2 for bot
+        if((bx > px) && (by > (py+(pysize/2))) && (by <= py+pysize))
+            return 2;
+        break;
+    }
+
+    return -1;
+}
+
+void moveball(void)
+{
+    ballx += ballxv;
+    bally += ballyv;
+    if(checkbounce())
+    {
+        bounce();
+        bally += ballyv*2;
+    }
+
+    int c = checkcollision();
+    if(c == -1)
+        return;
+    int p = 1;
+    if(ballx > 64)
+        p = 2;
+    ballx -= ballxv;
+    bally -= ballyv;
+    reflect(c, p);
+    ballx += ballxv;
+    bally += ballyv;
+}
 // calls the move functions
 void movesprites(void)
 {
+    moveball();
     movep1();
     movep2();
 }
 // updates their position on the scene
 void updateentities(void)
 {
-    
     movesprites();
     addsprite(p1, p1x, p1y);
     addsprite(p2, p2x, p2y);
+    addsprite(ball,(uint8_t)ballx,(uint8_t)bally);
 }
