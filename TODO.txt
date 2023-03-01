@@ -1,8 +1,0 @@
-//Fixa en display_scene() som tar in en scen och ritar den
-//Fixa en scene collector som tar in en sprite och sätter den i en scen
-//Fixa sprites som har position, storlek, rörelse// och kollision
-//Fixa input logic för rörelse
-Fixa meny-scener
-Fixa options i meny-scener
-Fixa input för att selecta options i meny-scener
-Fixa AI logik

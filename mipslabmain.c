@@ -54,6 +54,7 @@ int main(void) {
 	/* SPI2CON bit ON = 1; */
 	SPI2CONSET = 0x8000;
 	
+	// Theodor Björlman modified code under this in feb 2023
 	display_init();
 	clearscene();
 	display_scene(scene);

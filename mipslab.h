@@ -50,18 +50,20 @@ extern char textbuffer[4][16];
 void delay(int);
 void time2string( char *, int );
 /* Written as part of i/o lab: getbtns, getsw, enable_interrupt */
-int getbtns(void);
-int getsw(void);
+
+// Everything below is written by Theodor Björkman. Last modified 2023-03-01
+uint8_t getbtns(void);
+uint8_t getsw(void);
 void enable_interrupt(void);
 
-// Define variables for project. Everything below is written by Theodor Björkman
+
+// Define variables for project. 
 uint8_t scene[512]; // Scene for game
-int timeoutcount; // used for timing purposes
-int winner; // used to show winner
-int sceneselect; // 0 = game, 1 = victory screen, 2 = main menu, 3 = enter initials, 4 = select difficulty, 5 = scoreboard
+uint8_t winner; // used to show winner
+uint8_t sceneselect; // 0 = game, 1 = victory screen, 2 = main menu, 3 = enter initials, 4 = select difficulty, 5 = scoreboard
 int counter; // used to avoid going to a menu and then instantly selecting an option
-int difficulty; // difficuly level of AI
-int gamemode; // 0 is pvp 1 is pvAI
+uint8_t difficulty; // difficuly level of AI
+uint8_t gamemode; // 0 is pvp 1 is pvAI
 
 // Define functions for project.
 void display_scene( uint8_t *data); // displays a scene

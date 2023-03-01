@@ -2,6 +2,7 @@
    This file written 2015 by F Lundevall
    Some parts are original code written by Axel Isaksson
 
+   This file modified 2023-03-01 by Theodor Björkman
    For copyright and licensing, see file COPYING */
 
 #include <stdint.h>   /* Declarations of uint_32 and the like */
@@ -334,7 +335,7 @@ void display_scene(uint8_t *data) {
   ssr(0x20); // 0010 0000 set memory addressing mode, borde vara horizontal
   ssr(0); // möjligtvis krävs
 
-  ssr(0xa6); // inverse display seems to be default
+  ssr(0xa6); // set display to normal (a7 is inverse)
 
   ssr(0x21); // 0x21 set column address
   ssr(0); // column start
