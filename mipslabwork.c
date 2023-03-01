@@ -7,7 +7,7 @@
    add comment(s) here with your name(s) and date(s):
 
    This file modified 2017-04-31 by Ture Teknolog 
-   This file modified 2023-02-27 by Theodor Björkman
+   This file modified 2023-03-01 by Theodor Björkman
 
    For copyright and licensing, see file COPYING */
 
@@ -17,14 +17,12 @@
 
 int timeoutcount = 0;
 int sceneselect = 2;
-
 /* Interrupt Service Routine */
 
 void user_isr( void )
 {
   if (IFS(0) & 0x80){ // sw1
     IFSCLR(0) = 0x80;
-    sceneselect = 3;
   }
   if (IFS(0) & 0x800){ // sw2
     IFSCLR(0) = 0x800;
