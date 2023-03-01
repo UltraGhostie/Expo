@@ -59,6 +59,7 @@ void victoryscreen(void)
     case 1:
         sceneselect = 0;
         counter = 0;
+        time = 0;
         break;
 
     case 2:
