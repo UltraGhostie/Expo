@@ -55,12 +55,24 @@ int getsw(void);
 void enable_interrupt(void);
 
 // Define variables for project. Everything below is written by Theodor Björkman
-const uint8_t const test[128];
-uint8_t scene[512];
-int counter;
+uint8_t scene[512]; // Scene for game
+int timeoutcount; // used for timing purposes
+int winner; // used to show winner
+int sceneselect; // 0 = game, 1 = victory screen, 2 = main menu, 3 = enter initials, 4 = select difficulty, 5 = scoreboard
+int counter; // used to avoid going to a menu and then instantly selecting an option
+int difficulty; // difficuly level of AI
+int gamemode; // 0 is pvp 1 is pvAI
 
 // Define functions for project.
-void display_scene( uint8_t *data);
-void clearscene(void);
-void addsprite(uint8_t* sprite, uint8_t x, uint8_t y);
-void updateentities(void);
+void display_scene( uint8_t *data); // displays a scene
+void clearscene(void); // clears the scene "scene"
+void addsprite(uint8_t* sprite, uint8_t x, uint8_t y); // adds a sprite to the scene "scene"
+void updateentities(void); // used to run the game iself
+
+//scenes
+void game(void); // game
+void victoryscreen(void); // after a game has been ended by one player getting 5 points
+void mainmenu(void); // can go to game, scoreboard or selectdifficulty from here
+void enterinit(void); // allows input of 3 initials into scoreboard
+void scoreboard(void); // shows winners who have inputed initials
+void selectdifficulty(void); // select AI difficulty

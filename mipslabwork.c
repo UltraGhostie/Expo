@@ -16,6 +16,7 @@
 #include "mipslab.h"  /* Declatations for these labs */
 
 int timeoutcount = 0;
+int sceneselect = 2;
 
 /* Interrupt Service Routine */
 
@@ -23,23 +24,17 @@ void user_isr( void )
 {
   if (IFS(0) & 0x80){ // sw1
     IFSCLR(0) = 0x80;
-    clearscene();
+    sceneselect = 3;
   }
   if (IFS(0) & 0x800){ // sw2
     IFSCLR(0) = 0x800;
-    uint8_t testsprite[] = { 1, 1 };
-    addsprite(testsprite, 2, 2);
   }
   if (IFS(0) & 0x8000) // sw3
   {
     IFSCLR(0) = 0x8000;
-    uint8_t testsprite[] = { 2, 3 };
-    addsprite(testsprite, 4, 3);
   }
   if (IFS(0) & 0x80000){ // sw4
     IFSCLR(0) = 0x80000;
-    uint8_t testsprite[] = { 3, 9 };
-    addsprite(testsprite, 7, 4);
   }
   if (IFS(0) & 0x100 != 0x100) // timer2
   {
@@ -89,9 +84,33 @@ void labinit( void )
 // called by user_isr every timoutcount * 1/10 seconds
 void labwork( void )
 {
-  clearscene();
-  updateentities();
-  display_scene(scene);
+  switch (sceneselect)
+  {
+  case 0:
+    game();
+    break;
+  
+  case 1:
+    victoryscreen();
+    break;
+  
+  case 2:
+    mainmenu();
+    break;
+    
+  case 3:
+    enterinit();
+    break;
+    
+  case 4:
+    selectdifficulty();
+    break;
+    
+  case 5:
+    scoreboard();
+    break;
+  }
+  
 }
 
 /* clears the scene */
