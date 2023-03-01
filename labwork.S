@@ -18,7 +18,7 @@
 .endm
   #
   # Please add your own code below this line
-  #
+  # Everything below is written by Theodor Björkman, nothing above is
   .global delay, time2string, enable_interrupt
   .text
 # T: delay: delays for (hopefully) around $a0 ms

@@ -9,6 +9,9 @@ int moveticks = 0;
 uint8_t start = 0;
 uint8_t score[] = {0, 0};
 uint8_t winner;
+uint8_t second = 0;
+unsigned int time = 0x5959;
+char timestring[6] = "00:00";
 // 0 = 2-player, 1 = vs AI
 uint8_t gamemode = 0;
 
@@ -50,6 +53,8 @@ uint8_t ball[] = {3, 3};
 double ballxv = 0;
 double ballyv = 0;
 
+float maxangle = 0.5; // sets the max angle to arcsin(maxangle), since yv is arcsin(angle) this will effectively set max yv to 0.4 at the same time
+
 // bounce on top/bottom
 void bounce(void)
 {
@@ -82,7 +87,6 @@ void reflect(uint8_t player)
     // delta is the difference between the middle of the ball and the middle of the paddle
     float delta = (bally + ((float)ballysize / 2)) - (py + ((float)pysize / 2)); // delta is negative if middle of ball is above middle of player and reverse for reverse
     float maxdelta = (pysize / 2) + (ballysize / 2);                             // this is if the outer most pixels touch
-    float maxangle = 0.4;                                                        // sets the max angle to arcsin(maxangle), since yv is arcsin(angle) this will effectively set max yv to 0.4 at the same time
 
     // set a deadzone in the middle
     if (delta < 1 && delta > 0)
@@ -92,19 +96,20 @@ void reflect(uint8_t player)
 
     // case 0 is if middle of ball is over middle of paddle and case 1 is if opposite is true
     // this will map yv to its position in [yv,maxangle] depending on where delta is between [0,maxdelta]
+    float tempmax = maxangle;
     switch (delta > 0)
     {
     case 0:                           // delta is negative
         delta = -delta;               // make it pos
-        maxangle = -maxangle;         // we want to shift it toward the opposite side otherwise the same op
+        tempmax = -tempmax;         // we want to shift it toward the opposite side otherwise the same op
         delta /= maxdelta;            // put it between [0,1]
-        delta *= (maxangle - ballyv); // increase range to [0,maxangle-ballyv] where ballyv is smallest angle we want
+        delta *= (tempmax - ballyv); // increase range to [0,maxangle-ballyv] where ballyv is smallest angle we want
         delta += ballyv;              // shift range to [ballyv,maxangle]
         break;
 
     default: // delta is positive
         delta /= maxdelta;
-        delta *= (maxangle - ballyv);
+        delta *= (tempmax - ballyv);
         delta += ballyv;
         break;
     }
@@ -350,7 +355,7 @@ void bouncebottom(uint8_t p)
         break;
     }
     bally = py + pysize + 1;
-    ballyv = 0.4;
+    ballyv = maxangle;
     ballxv = direction * (1 - ballyv);
 }
 
@@ -370,7 +375,7 @@ void bouncetop(uint8_t p)
         break;
     }
     bally = py - ballysize - 1;
-    ballyv = -0.4;
+    ballyv = -maxangle;
     ballxv = direction * (1 + ballyv);
 }
 
@@ -427,6 +432,14 @@ void movesprites(void)
     if (moveticks == 100)
         moveticks = 0;
     moveticks++;
+    if (second < 100 || !start)
+    {
+        second++;
+        return;
+    }
+    second = 0;
+    time2string( timestring, time );
+    tick( &time );
 }
 // updates their position on the scene
 void updateentities(void)

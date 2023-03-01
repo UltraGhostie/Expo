@@ -1,9 +1,10 @@
+// Everything from here until otherwise stated is premade from labs
 /* mipslabmain.c
 
    This file written 2015 by Axel Isaksson,
    modified 2015, 2017 by F Lundevall
 
-   Latest update 2017-04-21 by F Lundevall
+   Latest update 2023-03-01 by Theodor Björkman
 
    For copyright and licensing, see file COPYING */
 
@@ -54,7 +55,7 @@ int main(void) {
 	/* SPI2CON bit ON = 1; */
 	SPI2CONSET = 0x8000;
 	
-	// Theodor Björlman modified code under this in feb 2023
+	// Theodor Björkman modified code under this in feb 2023
 	display_init();
 	clearscene();
 	display_scene(scene);

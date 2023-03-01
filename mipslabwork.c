@@ -1,3 +1,4 @@
+// Everything from here until otherwise stated is premade from labs
 /* mipslabwork.c
 
    This file written 2015 by F Lundevall

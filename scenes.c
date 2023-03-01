@@ -9,8 +9,10 @@ uint8_t select = 0;
 uint8_t check = 0;
 uint8_t innum[] = {0, 0, 0};
 char init[] = "AAA";
-char scrbrd[4][4] = {"AAA", "BBB", "CCC"};
+char scrbrd[4][4] = {"AAA", "AAA", "AAA"};
 char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+int playtimes[] = {0, 0, 0};
+char playtimestring[6][6] = {"00:00", "00:00", "00:00"};
 
 void game(void)
 {
@@ -30,12 +32,22 @@ void victoryscreen(void)
 
     case 2:
         display_string(0, "P2 won");
+        if (gamemode == 1)
+            display_string(0, "AI won");
         break;
     }
+
+    int accessinit = 1;
+    if (gamemode == 1 || time < playtimes[2])
+        accessinit = 0;
+
     display_string(1, "btn1: reset");
     display_string(2, "btn2: enter init");
+    if (!accessinit)
+        display_string(2, "");
     display_string(3, "btn3: main menu");
     display_update();
+
     if (counter < 100)
     {
         counter++;
@@ -50,6 +62,8 @@ void victoryscreen(void)
         break;
 
     case 2:
+        if (!accessinit)
+            break;
         sceneselect = 3;
         counter = 0;
         break;
@@ -63,6 +77,7 @@ void victoryscreen(void)
 
 void mainmenu(void)
 {
+    time = 0;
     display_string(0, "      PONG");
     display_string(1, "btn1:play");
     display_string(2, "btn2:play v AI");
@@ -172,26 +187,65 @@ void enterinit(void)
         break;
     }
 
-    init[0] = alphabet[innum[0]];
-    init[1] = alphabet[innum[1]];
-    init[2] = alphabet[innum[2]];
+    int8_t i = 2;
+    while (i >= 0)
+    {
+    init[i] = alphabet[innum[i]];
+    i--;
+    }
 
     display_string(1, "");
     display_string(3, init); // show current initials
     display_update();
 
-    if (counter > 3500) // if time runs out save initials and then return to main menu
+    if (counter > 3500) // if time runs out save initials and time and then return to main menu
     {
+        check = 0;
         sceneselect = 2;
-
-        int i = 0;
-        while (i < 3)
+        counter = 0;
+        uint8_t c = 1; // checks which slot should be used
+        if (time >= playtimes[2])
+            c = 2;
+        if (time >= playtimes[1])
+            c = 1;
+        if (time >= playtimes[0])
+            c = 0;
+        
+        i = 2;
+        int8_t j;
+        while (i > c) // moves scores down if needed
         {
-            scrbrd[2][i] = scrbrd[1][i];
-            scrbrd[1][i] = scrbrd[0][i];
-            scrbrd[0][i] = init[i];
+            j = 0;
+            while (j < 3) // letter by letter
+            {
+                scrbrd[i][j] = scrbrd[i-1][j];
+                j++;
+            }
+            j = 0;
+            while (j < 5) // moves times down if needed
+            {
+                playtimestring[i][j] = playtimestring[i-1][j];
+                j++;
+            }
+            i--;
+        }
+        
+        i = 0;
+        while (i < 3) // sets slot to right initials
+        {
+            scrbrd[c][i] = init[i];
             i++;
         }
+
+        // sets timestring and time in right slots
+        i = 5;
+        while (i > 0)
+        {
+            playtimestring[c][i] = timestring[i];
+            i--;
+        }
+        playtimes[c] = time;
+        time = 0;
     }
 }
 
@@ -201,14 +255,24 @@ void scoreboard(void)
     display_string(1, scrbrd[0]);
     display_string(2, scrbrd[1]);
     display_string(3, scrbrd[2]);
+    counter++;
+    if ((counter / 200) % 2 != 0)
+    {
+        display_string(1, playtimestring[0]);
+        display_string(2, playtimestring[1]);
+        display_string(3, playtimestring[2]);
+    }
+    
     display_update();
     if (counter < 50)
     {
-        counter++;
         return;
     }
     if (getbtns())
+    {
         sceneselect = 2;
+        counter = 0;
+    }
 }
 
 void selectdifficulty(void)
