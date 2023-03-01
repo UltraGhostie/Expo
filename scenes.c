@@ -245,7 +245,6 @@ void enterinit(void)
             i--;
         }
         playtimes[c] = time;
-        time = 0;
     }
 }
 
