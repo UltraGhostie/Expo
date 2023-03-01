@@ -75,7 +75,7 @@ void labinit( void )
 
   T2CON = 0x70; // T: reset timer and set prescale to 1:256
   TMR2 = 0x0; // T: clear timer register
-  PR2 = 0x7a12; // T: 31'250. 80 MHz / 256 / 31250 = 10 Hz
+  PR2 = 0xc35; // T: 31'25. 80 MHz / 256 / 3125 = 100 Hz
   IFSCLR(0) = 0x100;
   IECSET(0) = 0x100;
   IPCSET(2) = 0xe;
