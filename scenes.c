@@ -43,11 +43,11 @@ void victoryscreen(void)
 
     display_string(1, "btn1: reset");
     display_string(2, "btn2: enter init");
-    if (!accessinit)
+    if (accessinit == 0)
         display_string(2, "");
     display_string(3, "btn3: main menu");
     display_update();
-
+    
     if (counter < 100)
     {
         counter++;
@@ -63,7 +63,7 @@ void victoryscreen(void)
         break;
 
     case 2:
-        if (!accessinit)
+        if (accessinit == 0)
             break;
         sceneselect = 3;
         counter = 0;
@@ -217,6 +217,7 @@ void enterinit(void)
         while (i > c) // moves scores down if needed
         {
             j = 0;
+            playtimes[i] = playtimes[i-1];
             while (j < 3) // letter by letter
             {
                 scrbrd[i][j] = scrbrd[i-1][j];
